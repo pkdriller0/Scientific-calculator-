@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKDriller's Premium Scientific Calculator</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --display: #dfe6e9;
+            --number: #74b9ff;
+            --function: #00b894;
+            --operator: #e17055;
+            --scientific: #0984e3;
+            --error: #d63031;
+        }
+        
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        
+        .calculator-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 20px auto;
+        }
+        
+        .calculator {
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+        
+        .branding {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background-color: var(--light);
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 160px;
+        }
+        
+        .github-btn {
+            background-color: #333;
+            color: white;
+        }
+        
+        .whatsapp-btn {
+            background-color: #25D366;
+            color: white;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .social-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .social-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .display {
+            background-color: var(--display);
+            padding: 25px 20px;
+            text-align: right;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .display .current {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--dark);
+            word-break: break-all;
+            line-height: 1;
+            margin-top: 10px;
+            min-height: 42px;
+        }
+        
+        .display .previous {
+            font-size: 1.5rem;
+            color: #636e72;
+            min-height: 30px;
+            word-break: break-all;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 20px;
+            background-color: var(--light);
+            touch-action: manipulation;
+        }
+        
+        button {
+            border: none;
+            border-radius: 15px;
+            padding: 20px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            touch-action: manipulation;
+        }
+        
+        button:active, button.active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .number {
+            background-color: var(--number);
+            color: white;
+        }
+        
+        .operator {
+            background-color: var(--operator);
+            color: white;
+        }
+        
+        .function {
+            background-color: var(--function);
+            color: white;
+        }
+        
+        .scientific {
+            background-color: var(--scientific);
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .equals {
+            background-color: var(--accent);
+            color: white;
+            grid-column: span 2;
+            font-size: 1.5rem;
+        }
+        
+        .clear {
+            background-color: var(--error);
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .memory {
+            background-color: #fdcb6e;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .angle-mode {
+            background-color: #00cec9;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .angle-mode.active {
+            background-color: #8e44ad;
+        }
+        
+        .why-choose {
+            background-color: white;
+            padding: 20px;
+            border-top: 2px solid var(--secondary);
+            font-size: 1rem;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .why-choose h3 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .why-choose ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .why-choose li {
+            margin-bottom: 8px;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 1rem;
+            min-height: 20px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 480px) {
+            .calculator-container {
+                max-width: 100%;
+            }
+            
+            .buttons {
+                gap: 6px;
+                padding: 15px;
+            }
+            
+            button {
+                padding: 18px 0;
+                font-size: 1.2rem;
+            }
+            
+            .scientific {
+                font-size: 1rem;
+            }
+            
+            .display .current {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator">
+            <div class="branding">
+                PKDriller's Premium Calculator
+            </div>
+            
+            <div class="social-container">
+                <a href="https://github.com/pkdriller" target="_blank" class="social-btn github-btn">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    Follow on GitHub
+                </a>
+                <a href="https://whatsapp.com/channel/0029VaYourChannel" target="_blank" class="social-btn whatsapp-btn">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    WhatsApp Channel
+                </a>
+            </div>
+            
+            <div class="display">
+                <div class="previous" id="previous-operand"></div>
+                <div class="current" id="current-operand">0</div>
+                <div class="error-message" id="error-message"></div>
+            </div>
+            
+            <div class="buttons">
+                <!-- Memory Functions -->
+                <button class="memory" onclick="memoryAdd()">M+</button>
+                <button class="memory" onclick="memorySubtract()">M-</button>
+                <button class="memory" onclick="memoryRecall()">MR</button>
+                <button class="memory" onclick="memoryClear()">MC</button>
+                <button class="clear" onclick="clearAll()">AC</button>
+                
+                <!-- Scientific Functions Row 1 -->
+                <button class="scientific" onclick="calculateSin()">sin</button>
+                <button class="scientific" onclick="calculateCos()">cos</button>
+                <button class="scientific" onclick="calculateTan()">tan</button>
+                <button class="scientific" onclick="appendConstant('π', Math.PI)">π</button>
+                <button class="scientific" onclick="appendConstant('e', Math.E)">e</button>
+                
+                <!-- Scientific Functions Row 2 -->
+                <button class="scientific" onclick="calculateAsin()">sin⁻¹</button>
+                <button class="scientific" onclick="calculateAcos()">cos⁻¹</button>
+                <button class="scientific" onclick="calculateAtan()">tan⁻¹</button>
+                <button class="scientific" onclick="calculateSqrt()">√</button>
+                <button class="scientific" onclick="appendOperator('^')">^</button>
+                
+                <!-- Scientific Functions Row 3 -->
+                <button class="scientific" onclick="calculateLog()">log</button>
+                <button class="scientific" onclick="calculateLn()">ln</button>
+                <button class="scientific" onclick="calculateTenX()">10ˣ</button>
+                <button class="scientific" onclick="calculateExp()">eˣ</button>
+                <button class="scientific" onclick="calculateRandom()">RND</button>
+                
+                <!-- Mode Functions -->
+                <button class="angle-mode" id="deg-btn" onclick="setAngleMode('DEG')">DEG</button>
+                <button class="angle-mode" id="rad-btn" onclick="setAngleMode('RAD')">RAD</button>
+                <button class="angle-mode" id="grad-btn" onclick="setAngleMode('GRAD')">GRAD</button>
+                <button class="function" onclick="useAns()">ANS</button>
+                <button class="operator" onclick="calculateFactorial()">x!</button>
+                
+                <!-- Number Pad Row 1 -->
+                <button class="number" onclick="appendNumber('7')">7</button>
+                <button class="number" onclick="appendNumber('8')">8</button>
+                <button class="number" onclick="appendNumber('9')">9</button>
+                <button class="operator" onclick="appendOperator('/')">÷</button>
+                <button class="operator" onclick="appendOperator('(')">(</button>
+                
+                <!-- Number Pad Row 2 -->
+                <button class="number" onclick="appendNumber('4')">4</button>
+                <button class="number" onclick="appendNumber('5')">5</button>
+                <button class="number" onclick="appendNumber('6')">6</button>
+                <button class="operator" onclick="appendOperator('*')">×</button>
+                <button class="operator" onclick="appendOperator(')')">)</button>
+                
+                <!-- Number Pad Row 3 -->
+                <button class="number" onclick="appendNumber('1')">1</button>
+                <button class="number" onclick="appendNumber('2')">2</button>
+                <button class="number" onclick="appendNumber('3')">3</button>
+                <button class="operator" onclick="appendOperator('-')">-</button>
+                <button class="function" onclick="toggleHyp()">HYP</button>
+                
+                <!-- Number Pad Row 4 -->
+                <button class="number" onclick="appendNumber('0')">0</button>
+                <button class="number" onclick="appendDecimal()">.</button>
+                <button class="number" onclick="toggleSign()">±</button>
+                <button class="operator" onclick="appendOperator('+')">+</button>
+                <button class="operator" onclick="calculatePercentage()">%</button>
+                
+                <!-- Bottom Row -->
+                <button class="function" onclick="appendScientificNotation()">EE</button>
+                <button class="equals" onclick="calculate()">=</button>
+            </div>
+            
+            <div class="why-choose">
+                <h3>Why PKDriller's Calculator Stands Out</h3>
+                <ul>
+                    <li>🌈 Vibrant, modern interface with smooth animations</li>
+                    <li>🔬 Complete scientific functions for all your needs</li>
+                    <li>📱 Perfectly responsive for any device size</li>
+                    <li>⚡ Super-fast calculations with instant results</li>
+                    <li>💾 Advanced memory functions for complex work</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calculator state
+        let currentOperand = '0';
+        let previousOperand = '';
+        let operation = null;
+        let memoryValue = 0;
+        let angleMode = 'DEG';
+        let hypMode = false;
+        let lastAnswer = 0;
+        let isError = false;
+        
+        // DOM elements
+        const currentOperandElement = document.getElementById('current-operand');
+        const previousOperandElement = document.getElementById('previous-operand');
+        const errorMessageElement = document.getElementById('error-message');
+        const degBtn = document.getElementById('deg-btn');
+        const radBtn = document.getElementById('rad-btn');
+        const gradBtn = document.getElementById('grad-btn');
+        
+        // Update display
+        function updateDisplay() {
+            currentOperandElement.innerText = currentOperand;
+            previousOperandElement.innerText = previousOperand;
+            
+            // Add active class to current angle mode button
+            degBtn.classList.remove('active');
+            radBtn.classList.remove('active');
+            gradBtn.classList.remove('active');
+            
+            if (angleMode === 'DEG') degBtn.classList.add('active');
+            if (angleMode === 'RAD') radBtn.classList.add('active');
+            if (angleMode === 'GRAD') gradBtn.classList.add('active');
+            
+            if (hypMode) {
+                degBtn.style.backgroundColor = '#8e44ad';
+                radBtn.style.backgroundColor = '#8e44ad';
+                gradBtn.style.backgroundColor = '#8e44ad';
+            } else {
+                degBtn.style.backgroundColor = '#00cec9';
+                radBtn.style.backgroundColor = '#00cec9';
+                gradBtn.style.backgroundColor = '#00cec9';
+            }
+        }
+        
+        // Clear error
+        function clearError() {
+            isError = false;
+            errorMessageElement.innerText = '';
+        }
+        
+        // Set error
+        function setError(message) {
+            isError = true;
+            errorMessageElement.innerText = message;
+        }
+        
+        // Append number
+        function appendNumber(number) {
+            if (isError) clearAll();
+            
+            if (currentOperand === '0' && number !== '.') {
+                currentOperand = number;
+            } else {
+                currentOperand += number;
+            }
+            updateDisplay();
+        }
+        
+        // Append decimal
+        function appendDecimal() {
+            if (isError) clearAll();
+            
+            if (currentOperand.includes('.')) return;
+            if (currentOperand === '') {
+                currentOperand = '0';
+            }
+            currentOperand += '.';
+            updateDisplay();
+        }
+        
+        // Append operator
+        function appendOperator(op) {
+            if (isError) clearAll();
+            
+            if (currentOperand === '' && previousOperand !== '') {
+                // Allow changing the operator
+                previousOperand = previousOperand.slice(0, -1) + op;
+            } else if (currentOperand !== '') {
+                if (previousOperand !== '') {
+                    calculate();
+                }
+                operation = op;
+                previousOperand = currentOperand + ' ' + op;
+                currentOperand = '';
+            }
+            updateDisplay();
+        }
+        
+        // Append constant
+        function appendConstant(symbol, value) {
+            if (isError) clearAll();
+            
+            lastAnswer = value;
+            currentOperand = value.toString();
+            previousOperand = symbol;
+            updateDisplay();
+        }
+        
+        // Append scientific notation
+        function appendScientificNotation() {
+            if (isError) clearAll();
+            
+            if (currentOperand !== '' && currentOperand !== '0') {
+                currentOperand += 'e+';
+                updateDisplay();
+            }
+        }
+        
+        // Toggle sign
+        function toggleSign() {
+            if (isError) clearAll();
+            
+            if (currentOperand !== '' && currentOperand !== '0') {
+                if (currentOperand.startsWith('-')) {
+                    currentOperand = currentOperand.substring(1);
+                } else {
+                    currentOperand = '-' + currentOperand;
+                }
+                updateDisplay();
+            }
+        }
+        
+        // Clear all
+        function clearAll() {
+            currentOperand = '0';
+            previousOperand = '';
+            operation = null;
+            clearError();
+            updateDisplay();
+        }
+        
+        // Calculate
+        function calculate() {
+            if (isError) return clearAll();
+            
+            if (operation === null || currentOperand === '') return;
+            
+            try {
+                let result;
+                const prev = parseFloat(previousOperand);
+                const current = parseFloat(currentOperand);
+                
+                switch (operation) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '*':
+                        result = prev * current;
+                        break;
+                    case '/':
+                        if (current === 0) {
+                            setError("Cannot divide by zero");
+                            currentOperand = 'Error';
+                            updateDisplay();
+                            return;
+                        }
+                        result = prev / current;
+                        break;
+                    case '^':
+                        result = Math.pow(prev, current);
+                        break;
+                    default:
+                        return;
+                }
+                
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = '';
+                operation = null;
+                updateDisplay();
+            } catch (error) {
+                setError("Calculation error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        // Percentage calculation
+        function calculatePercentage() {
+            if (isError) clearAll();
+            
+            if (currentOperand === '') return;
+            
+            const value = parseFloat(currentOperand) / 100;
+            currentOperand = value.toString();
+            updateDisplay();
+        }
+        
+        // Memory functions
+        function memoryAdd() {
+            if (isError) clearAll();
+            
+            if (currentOperand !== '') {
+                memoryValue += parseFloat(currentOperand);
+                currentOperand = '0';
+                updateDisplay();
+            }
+        }
+        
+        function memorySubtract() {
+            if (isError) clearAll();
+            
+            if (currentOperand !== '') {
+                memoryValue -= parseFloat(currentOperand);
+                currentOperand = '0';
+                updateDisplay();
+            }
+        }
+        
+        function memoryRecall() {
+            if (isError) clearAll();
+            
+            currentOperand = memoryValue.toString();
+            updateDisplay();
+        }
+        
+        function memoryClear() {
+            memoryValue = 0;
+        }
+        
+        // Use last answer
+        function useAns() {
+            if (isError) clearAll();
+            
+            currentOperand = lastAnswer.toString();
+            updateDisplay();
+        }
+        
+        // Toggle hyperbolic mode
+        function toggleHyp() {
+            hypMode = !hypMode;
+            updateDisplay();
+        }
+        
+        // Set angle mode
+        function setAngleMode(mode) {
+            angleMode = mode;
+            updateDisplay();
+        }
+        
+        // Trigonometric functions
+        function calculateSin() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                if (angleMode === 'DEG') value = degToRad(value);
+                if (angleMode === 'GRAD') value = gradToRad(value);
+                
+                const result = hypMode ? Math.sinh(value) : Math.sin(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'sinh(' : 'sin(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateCos() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                if (angleMode === 'DEG') value = degToRad(value);
+                if (angleMode === 'GRAD') value = gradToRad(value);
+                
+                const result = hypMode ? Math.cosh(value) : Math.cos(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'cosh(' : 'cos(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateTan() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                if (angleMode === 'DEG') value = degToRad(value);
+                if (angleMode === 'GRAD') value = gradToRad(value);
+                
+                const result = hypMode ? Math.tanh(value) : Math.tan(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'tanh(' : 'tan(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        // Inverse trigonometric functions
+        function calculateAsin() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                let result = hypMode ? Math.asinh(value) : Math.asin(value);
+                
+                if (!hypMode) {
+                    if (value < -1 || value > 1) {
+                        setError("Domain error");
+                        currentOperand = 'Error';
+                        updateDisplay();
+                        return;
+                    }
+                    if (angleMode === 'DEG') result = radToDeg(result);
+                    if (angleMode === 'GRAD') result = radToGrad(result);
+                }
+                
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'asinh(' : 'asin(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateAcos() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                let result = hypMode ? Math.acosh(value) : Math.acos(value);
+                
+                if (!hypMode) {
+                    if (value < -1 || value > 1) {
+                        setError("Domain error");
+                        currentOperand = 'Error';
+                        updateDisplay();
+                        return;
+                    }
+                    if (angleMode === 'DEG') result = radToDeg(result);
+                    if (angleMode === 'GRAD') result = radToGrad(result);
+                } else {
+                    if (value < 1) {
+                        setError("Domain error");
+                        currentOperand = 'Error';
+                        updateDisplay();
+                        return;
+                    }
+                }
+                
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'acosh(' : 'acos(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateAtan() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                let result = hypMode ? Math.atanh(value) : Math.atan(value);
+                
+                if (hypMode && (value <= -1 || value >= 1)) {
+                    setError("Domain error");
+                    currentOperand = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                if (!hypMode) {
+                    if (angleMode === 'DEG') result = radToDeg(result);
+                    if (angleMode === 'GRAD') result = radToGrad(result);
+                }
+                
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = (hypMode ? 'atanh(' : 'atan(') + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        // Other scientific functions
+        function calculateSqrt() {
+            if (isError) clearAll();
+            
+            try {
+                const value = parseFloat(currentOperand);
+                if (value < 0) {
+                    setError("Negative root");
+                    currentOperand = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                const result = Math.sqrt(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = '√(' + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateLog() {
+            if (isError) clearAll();
+            
+            try {
+                const value = parseFloat(currentOperand);
+                if (value <= 0) {
+                    setError("Domain error");
+                    currentOperand = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                const result = Math.log10(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = 'log(' + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateLn() {
+            if (isError) clearAll();
+            
+            try {
+                const value = parseFloat(currentOperand);
+                if (value <= 0) {
+                    setError("Domain error");
+                    currentOperand = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                const result = Math.log(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = 'ln(' + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateTenX() {
+            if (isError) clearAll();
+            
+            try {
+                const value = parseFloat(currentOperand);
+                const result = Math.pow(10, value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = '10^(' + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateExp() {
+            if (isError) clearAll();
+            
+            try {
+                const value = parseFloat(currentOperand);
+                const result = Math.exp(value);
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = 'e^(' + value + ')';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateFactorial() {
+            if (isError) clearAll();
+            
+            try {
+                let value = parseFloat(currentOperand);
+                if (value < 0 || !Number.isInteger(value)) {
+                    setError("Invalid input");
+                    currentOperand = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                let result = 1;
+                for (let i = 2; i <= value; i++) {
+                    result *= i;
+                }
+                
+                lastAnswer = result;
+                currentOperand = result.toString();
+                previousOperand = value + '!';
+                updateDisplay();
+            } catch (error) {
+                setError("Math error");
+                currentOperand = 'Error';
+                updateDisplay();
+            }
+        }
+        
+        function calculateRandom() {
+            if (isError) clearAll();
+            
+            const result = Math.random();
+            lastAnswer = result;
+            currentOperand = result.toString();
+            previousOperand = 'RND';
+            updateDisplay();
+        }
+        
+        // Angle conversion functions
+        function degToRad(degrees) {
+            return degrees * Math.PI / 180;
+        }
+        
+        function radToDeg(radians) {
+            return radians * 180 / Math.PI;
+        }
+        
+        function gradToRad(grads) {
+            return grads * Math.PI / 200;
+        }
+        
+        function radToGrad(radians) {
+            return radians * 200 / Math.PI;
+        }
+        
+        // Initialize calculator
+        updateDisplay();
+        
+        // Add touch feedback for mobile devices
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('active');
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
